@@ -166,7 +166,7 @@ function App() {
       }
     };
 
-    document.addEventListener("scroll", (e) => {
+    document.addEventListener("scroll", (_) => {
       const scrollPercentage = currentScrollPercentage();
       console.log(scrollPercentage);
 
@@ -365,7 +365,7 @@ const Verse = ({ number, verse, indent, versesItem }: VerseProps) => {
                 .join(" "),
             }}
           >
-            {versesItem.selected.map((_, i) => (
+            {versesItem.selected.map((_) => (
               <Avatar
                 key={_.userID}
                 name={_.name}
