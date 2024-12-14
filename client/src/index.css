@@ -43,3 +43,14 @@ body {
     filter: invert(0);
   }
 }
+
+::-webkit-scrollbar {
+  display: none;
+  -webkit-appearance: none;
+}
+
+@media screen and (max-width: 768px) {
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+  }
+}
