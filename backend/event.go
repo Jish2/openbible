@@ -14,3 +14,11 @@ type Event struct {
 	VerseID int
 	Message string
 }
+
+type ScrollPosition struct {
+	UserID uuid.UUID
+	VerseID int
+}
+
+// {"Action":"scroll","VerseID":0,"Message":"test"}
+// {"Action":"test","VerseID":0,"Message":"test"}

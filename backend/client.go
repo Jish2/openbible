@@ -45,6 +45,8 @@ type Client struct {
 	Name   string
 	hub    *Hub
 
+	ScrollVerse int 
+
 	// The websocket connection.
 	conn *websocket.Conn
 
@@ -53,12 +55,9 @@ type Client struct {
 }
 
 // readPump pumps messages from the websocket connection to the hub.
-//
-// The application runs readPump in a per-connection goroutine. The application
-// ensures that there is at most one reader on a connection by executing all
-// reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
+		c.hub.addEvent(Event{Action: "leave", UUID: c.UserID})
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
@@ -82,20 +81,24 @@ func (c *Client) readPump() {
 			log.Println(err)
 			continue
 		}
-		handleMessage(c, parse)
+		c.handleMessage(parse)
 
 		c.hub.broadcast <- message
 	}
 }
 
-func handleMessage(c *Client, parse NewEvent) {
-	switch parse.Action {
-	case "comment":
-		
-	case "highlight":
-		
-	case "select":
-
+func (c *Client) handleMessage(parse NewEvent) {
+	if parse.Action == "scroll" {
+		c.ScrollVerse = parse.VerseID
+		return
+	}
+	event := Event{
+		UUID:    c.UserID,
+		Action:  parse.Action,
+		VerseID: parse.VerseID,
+		Message: parse.Message,
+	}
+	c.hub.addEvent(event)
 }
 
 // writePump pumps messages from the hub to the websocket connection.
@@ -159,11 +162,13 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		hub:    hub,
 		Name:   "test",
 		conn:   conn,
+		ScrollVerse: 0,
 		send:   make(chan []byte, 256)}
 
 	joinMsg := Response{
 		Action: "subscribe",
 		Msg:    uuid.String(),
+		Body:   hub.getAllEvents(),
 	}
 
 	parsedResponse, err := json.Marshal(joinMsg)

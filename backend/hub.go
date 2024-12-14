@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 )
 
 // Hub maintains the set of active clients and broadcasts messages to the
@@ -29,16 +30,42 @@ type Hub struct {
 	events []Event
 }
 
+func (h *Hub) getAllEvents() []Event {
+	return h.events
+}
+
 func (h *Hub) addEvent(event Event) {
 	h.mu.Lock()
 	h.events = append(h.events, event)
 	h.mu.Unlock()
-
-	h.broadcastMessage(event)
+	h.broadcastEvent(event)
 }
 
-func (hub *Hub) broadcastMessage(event Event) {
+func (hub *Hub) broadcastEvent(event Event) {
 	parsedResponse, err := json.Marshal(event)
+	if err != nil {
+		fmt.Println(err)
+	}
+	hub.broadcast <- []byte(parsedResponse)
+}
+
+func (hub *Hub) publishScrollPositions() {
+	var positions []*ScrollPosition
+
+	for client := range hub.clients {
+		curPos := ScrollPosition{
+			UserID: client.UserID,
+			VerseID: client.ScrollVerse,
+		}
+		positions = append(positions, &curPos)
+	}
+
+	message := Response{
+		Action: "positions",
+		Body: positions,
+	}
+
+	parsedResponse, err := json.Marshal(message)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -54,7 +81,17 @@ func newHub() *Hub {
 	}
 }
 
+func (h *Hub) tick(ticker *time.Ticker) {
+	for range ticker.C {
+		h.publishScrollPositions()
+	}
+}
+
+
 func (h *Hub) run() {
+	ticker := time.NewTicker(500 * time.Millisecond)
+	go h.tick(ticker)
+
 	for {
 		select {
 		case client := <-h.register:
