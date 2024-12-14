@@ -1,12 +1,148 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useRef } from "react";
 import john1 from "../../bible/books/john-1.json";
 import { cn } from "./utils/cn";
 import { MessageCircle } from "lucide-react";
 import { Avatar } from "./components/avatar";
 import { COLORS } from "./utils/constants";
 
+type User = {
+  name: string;
+  id: string;
+  scrollVerse: number;
+};
+
+type Comment = {
+  text: string;
+  userID: string;
+};
+
+type VerseInfo = {
+  highlights: string[]; //uuid[]
+  comments: Comment[];
+  selected: string[]; //uuid[]
+};
+
+type websocketEvent = {
+  Action: string;
+  VerseID?: number;
+  Message?: string;
+  UUID?: string;
+  Msg?: any;
+  Body?: any;
+};
+
+type EventAction = "comment" | "highlight" | "select" | "deselect";
+
+type Event = {
+  Action: EventAction;
+  VerseID: number;
+  Message: string;
+  UUID: string;
+};
+
 function App() {
   const [showMenu, setShowMenu] = useState<boolean>(false);
+
+  const [users, setUsers] = useState<User[]>([]);
+
+  const [verses, setVerses] = useState<VerseInfo[]>(() => {
+    return [...Array(john1.length)].map(
+      (_) =>
+        ({
+          highlights: [],
+          comments: [],
+          selected: [],
+        }) as VerseInfo,
+    );
+  });
+
+  useEffect(() => {
+    console.log("NEW VERSE UPDATE");
+    console.log(verses);
+  }, [verses]);
+
+  const [userID, setUserID] = useState<string>("");
+
+  const ws = useRef<any>(null);
+
+  const handleVerseEvent = (event: Event) => {
+    const index = event.VerseID;
+
+    if (event.Action === "select") {
+      const newVerses = [...verses];
+      newVerses[index].selected = [...newVerses[index].selected, event.UUID];
+      setVerses(newVerses);
+    }
+    if (event.Action === "deselect") {
+      const newVerses = [...verses];
+      newVerses[index].selected = newVerses[index].selected.filter(
+        (uuid) => uuid !== event.UUID,
+      );
+      setVerses(newVerses);
+    }
+    if (event.Action === "highlight") {
+      const newVerses = [...verses];
+      newVerses[index].highlights = [
+        ...newVerses[index].highlights,
+        event.UUID,
+      ];
+      setVerses(newVerses);
+    }
+    if (event.Action === "comment") {
+      const newVerses = [...verses];
+      newVerses[index].comments = [
+        ...newVerses[index].comments,
+        { text: event.Message, userID: event.UUID },
+      ];
+      setVerses(newVerses);
+    }
+  };
+
+  useEffect(() => {
+    ws.current = new WebSocket("ws://localhost:8080/ws");
+    ws.current.onopen = () => console.log("ws opened");
+    ws.current.onclose = () => console.log("ws closed");
+
+    const wsCurrent = ws.current;
+
+    return () => {
+      wsCurrent.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ws.current) {
+      return;
+    }
+    ws.current.onmessage = (event: any) => {
+      console.log(event.data);
+      const parse: websocketEvent = JSON.parse(event.data);
+      console.log(parse);
+      if (parse.Action === "subscribe") {
+        setUserID(parse.Msg);
+        if (parse.Body) {
+          for (let i = 0; i < parse.Body.length; i++) {
+            handleVerseEvent(parse.Body[i]);
+          }
+        }
+      } else if (parse.Action === "positions") {
+        setUsers(parse.Body);
+      } else {
+        handleVerseEvent(parse as Event);
+      }
+    };
+  }, []);
+
+  const sendMessage = (verse: number, action: EventAction, message: string) => {
+    ws.current.send(
+      JSON.stringify({
+        Action: action,
+        VerseID: verse,
+        Message: message,
+      }),
+    );
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div

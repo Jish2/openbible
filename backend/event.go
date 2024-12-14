@@ -17,8 +17,11 @@ type Event struct {
 
 type ScrollPosition struct {
 	UserID uuid.UUID
+	Name   string
 	VerseID int
 }
 
 // {"Action":"scroll","VerseID":0,"Message":"test"}
 // {"Action":"test","VerseID":0,"Message":"test"}
+
+// {"Action":"comment","VerseID":1,"Message":"comment one"}
