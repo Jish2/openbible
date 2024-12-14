@@ -312,12 +312,12 @@ function App() {
         </div>
       </div>
 
-      <button
+      {/* <button
         className="fixed bottom-0 left-0 p-4 bg-red-300"
         onClick={() => setShowMenu((p) => !p)}
       >
         trigger
-      </button>
+      </button> */}
       <div
         className={cn(
           showMenu
