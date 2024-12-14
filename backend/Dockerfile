@@ -1,7 +1,7 @@
 FROM golang:latest as build
 
 # Set working directory inside container
-WORKDIR /app/backene
+WORKDIR /app
 
 # Copy Go module files and download dependencies
 COPY go.mod go.sum ./
