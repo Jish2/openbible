@@ -2,12 +2,45 @@ import { Fragment, useState } from "react";
 import john1 from "../../bible/books/john-1.json";
 import { cn } from "./utils/cn";
 import { MessageCircle } from "lucide-react";
+import { Avatar } from "./components/avatar";
+import { COLORS } from "./utils/constants";
 
 function App() {
   const [showMenu, setShowMenu] = useState<boolean>(false);
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
-      <div className="max-w-[30rem] p-4">
+      <div
+        className="fixed top-0 w-full z-10 flex py-2 px-4 justify-between bg-background shadow-derek"
+        onClick={() => setShowMenu((p) => !p)}
+      >
+        <div className="flex items-center gap-2">
+          <h1 className="font-bold dark:bg-red-500 dark:text-nowrap">
+            OpenBible
+          </h1>
+          <a
+            href="https://github.com/jish2/openbible"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img
+              id="github"
+              src="/github.svg"
+              alt="github"
+              className="size-4 invert"
+            />
+          </a>
+        </div>
+
+        <div className="flex -space-x-2 overflow-hidden">
+          {Array(5)
+            .fill(0)
+            .map((_, i) => (
+              <Avatar key={i} color={COLORS[i]} zIndex={100 - i} />
+            ))}
+        </div>
+      </div>
+      <div className="max-w-[30rem] p-4 pt-16">
+        <h1 className="font-bold text-2xl my-2">John 1</h1>
         {john1.map(([key, verse], i) => {
           const indent =
             i !== 0 &&
