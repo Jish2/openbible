@@ -43,7 +43,7 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	UserID uuid.UUID
 	Name   string
-	hub *Hub
+	hub    *Hub
 
 	// The websocket connection.
 	conn *websocket.Conn
@@ -74,8 +74,28 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+
+		var parse NewEvent
+		err = json.NewDecoder(bytes.NewReader(message)).Decode(&parse)
+
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		handleMessage(c, parse)
+
 		c.hub.broadcast <- message
 	}
+}
+
+func handleMessage(c *Client, parse NewEvent) {
+	switch parse.Action {
+	case "comment":
+		
+	case "highlight":
+		
+	case "select":
+
 }
 
 // writePump pumps messages from the hub to the websocket connection.
@@ -83,7 +103,7 @@ func (c *Client) readPump() {
 // A goroutine running writePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
-func (c *Client) writePump() {
+func (c *Client) writePump() { 
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -155,8 +175,8 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	client.hub.register <- client
 
 	client.hub.addEvent(Event{
-		UUID:   uuid,
-		Action: "join",
+		UUID:    uuid,
+		Action:  "join",
 		VerseID: 0,
 		Message: client.Name,
 	})

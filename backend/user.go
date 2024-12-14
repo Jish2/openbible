@@ -11,6 +11,5 @@ type User struct {
 type Response struct {
 	Action string
 	Msg    string
-	Body any
+	Body   any
 }
-
