@@ -8,9 +8,13 @@
   line-height: 2em;
   font-weight: 400;
 
+  --background-color: #242424;
+  --foreground-color: rgba(255, 255, 255, 0.87);
+
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--foreground-color);
+
+  background-color: var(--background-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -28,10 +32,14 @@ body {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --background-color: #ffffff;
+    --foreground-color: #213547;
   }
   button {
     background-color: #f9f9f9;
+  }
+
+  #github {
+    filter: invert(0);
   }
 }
