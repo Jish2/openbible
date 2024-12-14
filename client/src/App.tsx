@@ -1,8 +1,9 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import john1 from "../../bible/books/john-1.json";
-import { cn } from "./utils/cn";
+import { cn } from "@/lib/utils";
 import { Highlighter, MessageCircle } from "lucide-react";
 import { Avatar } from "./components/avatar";
+import { BottomSheet } from "@/components/bottom-sheet";
 
 const names = [
   "Simon",
@@ -36,7 +37,7 @@ type SelectedUser = {
   userID: string;
 };
 
-type VerseInfo = {
+export type VerseInfo = {
   highlights: SelectedUser[]; //uuid[]
   comments: Comment[];
   selected: SelectedUser[]; //uuid[]
@@ -52,7 +53,12 @@ type websocketEvent = {
   Body?: any;
 };
 
-type EventAction = "comment" | "highlight" | "select" | "deselect" | "scroll";
+export type EventAction =
+  | "comment"
+  | "highlight"
+  | "select"
+  | "deselect"
+  | "scroll";
 
 type Event = {
   Name: string;
@@ -66,6 +72,8 @@ function App() {
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   const [users, setUsers] = useState<User[]>([]);
+
+  const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
 
   const [verses, setVerses] = useState<VerseInfo[]>(() => {
     return [...Array(john1.length)].map(
@@ -201,6 +209,14 @@ function App() {
     );
   };
 
+  const isHighlighted = (verseNumber: number) =>
+    Boolean(
+      verseNumber
+        ? verses[verseNumber]?.highlights.find((a) => a.userID === userID)
+            ?.userID
+        : false,
+    );
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div
@@ -242,7 +258,7 @@ function App() {
         </div>
       </div>
       <div className="flex flex-row">
-        <div className="max-w-[30rem] p-4 pt-16">
+        <div className="max-w-[30rem] p-4 py-16">
           <h1 className="font-bold text-2xl my-2">John 1</h1>
           {john1.map(([key, verse], i) => {
             const indent =
@@ -264,6 +280,11 @@ function App() {
                 verse={verse}
                 indent={indent}
                 versesItem={verses[i]}
+                onClick={() => setSelectedVerse(Number(key))}
+                active={selectedVerse === Number(key)}
+                commentCount={verses[i].comments.length}
+                highlightCount={verses[i].highlights.length}
+                isHighlighted={isHighlighted}
               />
             );
           })}
@@ -310,6 +331,14 @@ function App() {
           <div className="px-2">{item}</div>
         ))}
       </div>
+
+      <BottomSheet
+        setSelectedVerse={setSelectedVerse}
+        verses={verses}
+        verseNumber={selectedVerse}
+        sendMessage={sendMessage}
+        isHighlighted={isHighlighted}
+      />
     </div>
   );
 }
@@ -321,61 +350,78 @@ interface VerseProps {
   verse: string;
   indent: boolean;
   versesItem: VerseInfo;
+  onClick: () => void;
+  active: boolean;
+  commentCount: number;
+  highlightCount: number;
+  isHighlighted: (verseNumber: number) => boolean;
 }
 
-const Verse = ({ number, verse, indent, versesItem }: VerseProps) => {
-  const [active, setActive] = useState<boolean>(false);
-  const [a, sA] = useState<string[]>([]);
-
+const Verse = ({
+  number,
+  verse,
+  indent,
+  versesItem,
+  onClick,
+  commentCount,
+  highlightCount,
+  isHighlighted,
+}: VerseProps) => {
   return (
     <Fragment>
       {indent && <div className="w-6 inline-block" />}
-      <span
-        className="py-2 cursor-pointer"
-        onClick={() => setActive((p) => !p)}
-      >
+      <span className="py-2 cursor-pointer" onClick={onClick}>
         <sup className="text-xs text-gray-500 pr-1">{number}</sup>
         <span
           className={cn(
-            active && "underline decoration-dotted underline-offset-4",
+            isHighlighted(Number(number)) &&
+              "underline decoration-dotted underline-offset-4",
           )}
         >
           {verse}
         </span>
         <div className="w-1.5 inline-block" />
       </span>
-      <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
-        {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
-        <div className="flex gap-1 items-center max-h-4">
-          {/* <span className="text-xs">13</span> */}
-          <div className="flex items-center gap-0.5">
-            <span className="text-[10px]">12</span>
-            <MessageCircle size={12} className="" />
+      {commentCount !== 0 &&
+        highlightCount !== 0 &&
+        versesItem.selected.length !== 0 && (
+          <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
+            {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
+            <div className="flex gap-1 items-center max-h-4">
+              {/* <span className="text-xs">13</span> */}
+              {commentCount > 0 && (
+                <div className="flex items-center gap-0.5">
+                  <span className="text-[10px]">{commentCount}</span>
+                  <MessageCircle size={12} className="" />
+                </div>
+              )}
+              {highlightCount > 0 && (
+                <div className="flex items-center gap-0.5">
+                  <span className="text-[10px]">{highlightCount}</span>
+                  <Highlighter size={12} className="" />
+                </div>
+              )}
+              <div
+                className={cn("gap-0.5 grid transition-all ease-in-out")}
+                style={{
+                  gridTemplateColumns: Array(versesItem.selected.length)
+                    .fill(0)
+                    .map(() => `1fr`)
+                    .join(" "),
+                }}
+              >
+                {versesItem.selected.map((_) => (
+                  <Avatar
+                    key={_.userID}
+                    name={_.name}
+                    userID={_.userID}
+                    className="size-4 grid-cols-1"
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-0.5">
-            <span className="text-[10px]">12</span>
-            <Highlighter size={12} className="" />
-          </div>
-          <div
-            className={cn("gap-0.5 grid transition-all ease-in-out")}
-            style={{
-              gridTemplateColumns: Array(a.length)
-                .fill(0)
-                .map(() => `1fr`)
-                .join(" "),
-            }}
-          >
-            {versesItem.selected.map((_) => (
-              <Avatar
-                key={_.userID}
-                name={_.name}
-                userID={_.userID}
-                className="size-4 grid-cols-1"
-              />
-            ))}
-          </div>
-        </div>
-      </div>
+        )}
     </Fragment>
   );
 };
