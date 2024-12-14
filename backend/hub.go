@@ -90,7 +90,7 @@ func (h *Hub) tick(ticker *time.Ticker) {
 
 
 func (h *Hub) run() {
-	ticker := time.NewTicker(10000 * time.Millisecond)
+	ticker := time.NewTicker(100 * time.Millisecond)
 	go h.tick(ticker)
 
 	for {

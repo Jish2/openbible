@@ -4,6 +4,21 @@ import { cn } from "./utils/cn";
 import { Highlighter, MessageCircle } from "lucide-react";
 import { Avatar } from "./components/avatar";
 
+const names = [
+  "Simon",
+  "Andrew",
+  "James",
+  "John",
+  "Philip",
+  "Bartholomew",
+  "Thomas",
+  "Matthew",
+  "James",
+  "Thaddaeus",
+  "Simon",
+  "Judas",
+];
+
 type User = {
   Name: string;
   UserID: string;
@@ -37,7 +52,7 @@ type websocketEvent = {
   Body?: any;
 };
 
-type EventAction = "comment" | "highlight" | "select" | "deselect";
+type EventAction = "comment" | "highlight" | "select" | "deselect" | "scroll";
 
 type Event = {
   Name: string;
@@ -114,7 +129,9 @@ function App() {
   };
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8080/ws");
+    ws.current = new WebSocket(
+      `ws://localhost:8080/ws?name=${names[Math.floor(Math.random() * names.length)]} `,
+    );
     ws.current.onopen = () => console.log("ws opened");
     ws.current.onclose = () => console.log("ws closed");
 
@@ -141,14 +158,40 @@ function App() {
           }
         }
       } else if (parse.Action === "positions") {
-        setUsers(parse.Body);
+        let positions = parse.Body as User[];
+        positions.sort((a, b) => a.UserID.localeCompare(b.UserID));
+        setUsers(positions);
       } else {
         handleVerseEvent(parse as Event);
       }
     };
-  }, []);
 
-  const sendMessage = (verse: number, action: EventAction, message: string) => {
+    document.addEventListener("scroll", (e) => {
+      const scrollPercentage = currentScrollPercentage();
+      console.log(scrollPercentage);
+
+      sendMessage(Math.round(scrollPercentage), "scroll");
+    });
+  }, []);
+  function currentScrollPercentage() {
+    return (
+      ((document.documentElement.scrollTop + document.body.scrollTop) /
+        (document.documentElement.scrollHeight -
+          document.documentElement.clientHeight)) *
+      100
+    );
+  }
+
+  const scrollTo = (percentage: number) => {
+    let unit = document.documentElement.scrollHeight / 100;
+    window.scrollTo({ top: percentage * unit });
+  };
+
+  const sendMessage = (
+    verse: number,
+    action: EventAction,
+    message?: string,
+  ) => {
     ws.current.send(
       JSON.stringify({
         Action: action,
@@ -189,36 +232,65 @@ function App() {
           scrollVerse: number;
         }; */}
           {users.map((_, i) => (
-            <Avatar key={i} name={_.Name} userID={_.UserID} zIndex={100 - i} />
+            <Avatar
+              key={_.UserID}
+              name={_.Name}
+              userID={_.UserID}
+              zIndex={100 - i}
+            />
           ))}
         </div>
       </div>
-      <div className="max-w-[30rem] p-4 pt-16">
-        <h1 className="font-bold text-2xl my-2">John 1</h1>
-        {john1.map(([key, verse], i) => {
-          const indent =
-            i !== 0 &&
-            (john1[i - 1][0] === "spacer" || john1[i - 1][0] === "title");
+      <div className="flex flex-row">
+        <div className="max-w-[30rem] p-4 pt-16">
+          <h1 className="font-bold text-2xl my-2">John 1</h1>
+          {john1.map(([key, verse], i) => {
+            const indent =
+              i !== 0 &&
+              (john1[i - 1][0] === "spacer" || john1[i - 1][0] === "title");
 
-          if (key === "spacer") return <br key={i} />;
-          if (key === "title")
+            if (key === "spacer") return <br key={i} />;
+            if (key === "title")
+              return (
+                <h3 className="font-bold mt-5 mb-1" key={i}>
+                  {verse}
+                </h3>
+              );
+
             return (
-              <h3 className="font-bold mt-5 mb-1" key={i}>
-                {verse}
-              </h3>
+              <Verse
+                key={i}
+                number={key}
+                verse={verse}
+                indent={indent}
+                versesItem={verses[i]}
+              />
             );
-
-          return (
-            <Verse
-              key={i}
-              number={key}
-              verse={verse}
-              indent={indent}
-              versesItem={verses[i]}
-            />
-          );
-        })}
+          })}
+        </div>
       </div>
+
+      <div className="fixed right-2 top-0 h-screen">
+        {/* <div className="w-4 bg-gray-200/10 rounded-sm" /> */}
+        <div className="w-4 bg-gray-200/10 rounded-sm py-20 h-full">
+          {users.map((_, i) => (
+            <div
+              className="fixed transition-all duration-300"
+              style={{ top: `${Math.min(98, Math.max(5, _.VerseID))}%` }}
+              key={_.UserID}
+              onClick={() => scrollTo(_.VerseID)}
+            >
+              <Avatar
+                key={i}
+                name={_.Name}
+                userID={_.UserID}
+                className="size-4"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <button
         className="fixed bottom-0 left-0 p-4 bg-red-300"
         onClick={() => setShowMenu((p) => !p)}
@@ -295,6 +367,7 @@ const Verse = ({ number, verse, indent, versesItem }: VerseProps) => {
           >
             {versesItem.selected.map((_, i) => (
               <Avatar
+                key={_.userID}
                 name={_.name}
                 userID={_.userID}
                 className="size-4 grid-cols-1"
