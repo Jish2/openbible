@@ -1,16 +1,27 @@
 import { cn } from "../utils/cn";
+import { COLORS } from "../utils/constants";
 
 interface AvatarProps {
-  color: string;
   zIndex?: number;
   className?: string;
+  name: string;
+  userID: string;
 }
 
-export const Avatar = ({ color, zIndex, className }: AvatarProps) => {
+const getColor = (hash: string) => {
+  return COLORS[hash.charCodeAt(hash.length - 1) % COLORS.length];
+};
+
+export const Avatar = ({ zIndex, className, name, userID }: AvatarProps) => {
   return (
     <div
-      className={cn("inline-block size-8 rounded-full", className)}
-      style={{ backgroundColor: color, zIndex }}
-    />
+      className={cn(
+        "size-8 rounded-full flex flex-col items-center justify-center",
+        className,
+      )}
+      style={{ backgroundColor: getColor(userID), zIndex }}
+    >
+      {name ? name[0] : "?"}
+    </div>
   );
 };

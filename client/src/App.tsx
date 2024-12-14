@@ -3,12 +3,11 @@ import john1 from "../../bible/books/john-1.json";
 import { cn } from "./utils/cn";
 import { Highlighter, MessageCircle } from "lucide-react";
 import { Avatar } from "./components/avatar";
-import { COLORS } from "./utils/constants";
 
 type User = {
-  name: string;
-  id: string;
-  scrollVerse: number;
+  Name: string;
+  UserID: string;
+  VerseID: number;
 };
 
 type Comment = {
@@ -68,6 +67,11 @@ function App() {
     console.log("NEW VERSE UPDATE");
     console.log(verses);
   }, [verses]);
+
+  useEffect(() => {
+    console.log("NEW USERS UPDATE");
+    console.log(users);
+  }, [users]);
 
   const [userID, setUserID] = useState<string>("");
 
@@ -179,11 +183,14 @@ function App() {
         </div>
 
         <div className="flex -space-x-2 overflow-hidden">
-          {Array(5)
-            .fill(0)
-            .map((_, i) => (
-              <Avatar key={i} color={COLORS[i]} zIndex={100 - i} />
-            ))}
+          {/* type User = {
+          name: string;
+          id: string;
+          scrollVerse: number;
+        }; */}
+          {users.map((_, i) => (
+            <Avatar key={i} name={_.Name} userID={_.UserID} zIndex={100 - i} />
+          ))}
         </div>
       </div>
       <div className="max-w-[30rem] p-4 pt-16">
@@ -201,7 +208,15 @@ function App() {
               </h3>
             );
 
-          return <Verse key={i} number={key} verse={verse} indent={indent} />;
+          return (
+            <Verse
+              key={i}
+              number={key}
+              verse={verse}
+              indent={indent}
+              versesItem={verses[i]}
+            />
+          );
         })}
       </div>
       <button
@@ -233,9 +248,10 @@ interface VerseProps {
   number: string;
   verse: string;
   indent: boolean;
+  versesItem: VerseInfo;
 }
 
-const Verse = ({ number, verse, indent }: VerseProps) => {
+const Verse = ({ number, verse, indent, versesItem }: VerseProps) => {
   const [active, setActive] = useState<boolean>(false);
   const [a, sA] = useState<string[]>([]);
 
@@ -256,10 +272,7 @@ const Verse = ({ number, verse, indent }: VerseProps) => {
         </span>
         <div className="w-1.5 inline-block" />
       </span>
-      <div
-        className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5"
-        onClick={() => sA((p) => [...p, "new"])}
-      >
+      <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
         {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
         <div className="flex gap-1 items-center max-h-4">
           {/* <span className="text-xs">13</span> */}
@@ -280,10 +293,10 @@ const Verse = ({ number, verse, indent }: VerseProps) => {
                 .join(" "),
             }}
           >
-            {a.map((_, i) => (
+            {versesItem.selected.map((_, i) => (
               <Avatar
-                key={COLORS[i]}
-                color={COLORS[i]}
+                name={_.name}
+                userID={_.userID}
                 className="size-4 grid-cols-1"
               />
             ))}
