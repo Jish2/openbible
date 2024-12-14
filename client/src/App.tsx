@@ -382,46 +382,48 @@ const Verse = ({
         </span>
         <div className="w-1.5 inline-block" />
       </span>
-      {commentCount !== 0 &&
+      {!(
+        commentCount !== 0 &&
         highlightCount !== 0 &&
-        versesItem.selected.length !== 0 && (
-          <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
-            {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
-            <div className="flex gap-1 items-center max-h-4">
-              {/* <span className="text-xs">13</span> */}
-              {commentCount > 0 && (
-                <div className="flex items-center gap-0.5">
-                  <span className="text-[10px]">{commentCount}</span>
-                  <MessageCircle size={12} className="" />
-                </div>
-              )}
-              {highlightCount > 0 && (
-                <div className="flex items-center gap-0.5">
-                  <span className="text-[10px]">{highlightCount}</span>
-                  <Highlighter size={12} className="" />
-                </div>
-              )}
-              <div
-                className={cn("gap-0.5 grid transition-all ease-in-out")}
-                style={{
-                  gridTemplateColumns: Array(versesItem.selected.length)
-                    .fill(0)
-                    .map(() => `1fr`)
-                    .join(" "),
-                }}
-              >
-                {versesItem.selected.map((_) => (
-                  <Avatar
-                    key={_.userID}
-                    name={_.name}
-                    userID={_.userID}
-                    className="size-4 grid-cols-1"
-                  />
-                ))}
+        versesItem.selected.length !== 0
+      ) && (
+        <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
+          {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
+          <div className="flex gap-1 items-center max-h-4">
+            {/* <span className="text-xs">13</span> */}
+            {commentCount > 0 && (
+              <div className="flex items-center gap-0.5">
+                <span className="text-[10px]">{commentCount}</span>
+                <MessageCircle size={12} className="" />
               </div>
+            )}
+            {highlightCount > 0 && (
+              <div className="flex items-center gap-0.5">
+                <span className="text-[10px]">{highlightCount}</span>
+                <Highlighter size={12} className="" />
+              </div>
+            )}
+            <div
+              className={cn("gap-0.5 grid transition-all ease-in-out")}
+              style={{
+                gridTemplateColumns: Array(versesItem.selected.length)
+                  .fill(0)
+                  .map(() => `1fr`)
+                  .join(" "),
+              }}
+            >
+              {versesItem.selected.map((_) => (
+                <Avatar
+                  key={_.userID}
+                  name={_.name}
+                  userID={_.userID}
+                  className="size-4 grid-cols-1"
+                />
+              ))}
             </div>
           </div>
-        )}
+        </div>
+      )}
     </Fragment>
   );
 };
