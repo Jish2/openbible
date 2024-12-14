@@ -1,5 +1,5 @@
-import { cn } from "../utils/cn";
-import { COLORS } from "../utils/constants";
+import { COLORS } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 interface AvatarProps {
   zIndex?: number;
