@@ -57,7 +57,7 @@ type Client struct {
 // readPump pumps messages from the websocket connection to the hub.
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.addEvent(Event{Action: "leave", UUID: c.UserID})
+		// c.hub.addEvent(Event{Action: "leave", UUID: c.UserID})
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
@@ -82,8 +82,6 @@ func (c *Client) readPump() {
 			continue
 		}
 		c.handleMessage(parse)
-
-		c.hub.broadcast <- message
 	}
 }
 
@@ -169,12 +167,12 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	client.hub.register <- client
 
 	// add and broadcast join event
-	client.hub.addEvent(Event{
-		UUID:    uuid,
-		Action:  "join",
-		VerseID: 0,
-		Message: client.Name,
-	})
+	// client.hub.addEvent(Event{
+	// 	UUID:    uuid,
+	// 	Action:  "join",
+	// 	VerseID: 0,
+	// 	Message: client.Name,
+	// })
 
 	// send join message back to client, with event state
 	joinMsg := Response{

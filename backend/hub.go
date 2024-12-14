@@ -56,6 +56,7 @@ func (hub *Hub) publishScrollPositions() {
 		curPos := ScrollPosition{
 			UserID: client.UserID,
 			VerseID: client.ScrollVerse,
+			Name: client.Name,
 		}
 		positions = append(positions, &curPos)
 	}
@@ -89,7 +90,7 @@ func (h *Hub) tick(ticker *time.Ticker) {
 
 
 func (h *Hub) run() {
-	ticker := time.NewTicker(500 * time.Millisecond)
+	ticker := time.NewTicker(10000 * time.Millisecond)
 	go h.tick(ticker)
 
 	for {
