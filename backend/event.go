@@ -10,7 +10,7 @@ type NewEvent struct {
 
 type Event struct {
 	UUID    uuid.UUID
-	name    string
+	Name    string
 	Action  string
 	VerseID int
 	Message string

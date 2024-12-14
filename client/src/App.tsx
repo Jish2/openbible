@@ -13,13 +13,19 @@ type User = {
 
 type Comment = {
   text: string;
+  name: string;
+  userID: string;
+};
+
+type SelectedUser = {
+  name: string;
   userID: string;
 };
 
 type VerseInfo = {
   highlights: string[]; //uuid[]
   comments: Comment[];
-  selected: string[]; //uuid[]
+  selected: SelectedUser[]; //uuid[]
 };
 
 type websocketEvent = {
@@ -27,6 +33,7 @@ type websocketEvent = {
   VerseID?: number;
   Message?: string;
   UUID?: string;
+  name?: string;
   Msg?: any;
   Body?: any;
 };
@@ -34,6 +41,7 @@ type websocketEvent = {
 type EventAction = "comment" | "highlight" | "select" | "deselect";
 
 type Event = {
+  Name: string;
   Action: EventAction;
   VerseID: number;
   Message: string;
@@ -70,13 +78,16 @@ function App() {
 
     if (event.Action === "select") {
       const newVerses = [...verses];
-      newVerses[index].selected = [...newVerses[index].selected, event.UUID];
+      newVerses[index].selected = [
+        ...newVerses[index].selected,
+        { name: event.Name, userID: event.UUID },
+      ];
       setVerses(newVerses);
     }
     if (event.Action === "deselect") {
       const newVerses = [...verses];
       newVerses[index].selected = newVerses[index].selected.filter(
-        (uuid) => uuid !== event.UUID,
+        (item) => item.userID !== event.UUID,
       );
       setVerses(newVerses);
     }
@@ -92,7 +103,7 @@ function App() {
       const newVerses = [...verses];
       newVerses[index].comments = [
         ...newVerses[index].comments,
-        { text: event.Message, userID: event.UUID },
+        { text: event.Message, userID: event.UUID, name: event.Name },
       ];
       setVerses(newVerses);
     }

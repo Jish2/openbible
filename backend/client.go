@@ -92,7 +92,7 @@ func (c *Client) handleMessage(parse NewEvent) {
 	}
 	event := Event{
 		UUID:    c.UserID,
-		name:    c.Name,
+		Name:    c.Name,
 		Action:  parse.Action,
 		VerseID: parse.VerseID,
 		Message: parse.Message,
