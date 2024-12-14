@@ -23,7 +23,7 @@ type SelectedUser = {
 };
 
 type VerseInfo = {
-  highlights: string[]; //uuid[]
+  highlights: SelectedUser[]; //uuid[]
   comments: Comment[];
   selected: SelectedUser[]; //uuid[]
 };
@@ -95,7 +95,7 @@ function App() {
       const newVerses = [...verses];
       newVerses[index].highlights = [
         ...newVerses[index].highlights,
-        event.UUID,
+        { name: event.Name, userID: event.UUID },
       ];
       setVerses(newVerses);
     }
