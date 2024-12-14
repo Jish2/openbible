@@ -157,14 +157,26 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// create client and register
 	client := &Client{
 		UserID: uuid,
 		hub:    hub,
-		Name:   "test",
+		Name:   r.FormValue("name"),
 		conn:   conn,
 		ScrollVerse: 0,
 		send:   make(chan []byte, 256)}
 
+	client.hub.register <- client
+
+	// add and broadcast join event
+	client.hub.addEvent(Event{
+		UUID:    uuid,
+		Action:  "join",
+		VerseID: 0,
+		Message: client.Name,
+	})
+
+	// send join message back to client, with event state
 	joinMsg := Response{
 		Action: "subscribe",
 		Msg:    uuid.String(),
@@ -176,15 +188,6 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	client.hub.register <- client
-
-	client.hub.addEvent(Event{
-		UUID:    uuid,
-		Action:  "join",
-		VerseID: 0,
-		Message: client.Name,
-	})
 
 	client.send <- []byte(parsedResponse)
 
