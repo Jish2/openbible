@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import john1 from "../../bible/books/john-1.json";
 import { cn } from "./utils/cn";
-import { MessageCircle } from "lucide-react";
+import { Highlighter, MessageCircle } from "lucide-react";
 import { Avatar } from "./components/avatar";
 import { COLORS } from "./utils/constants";
 
@@ -226,6 +226,7 @@ interface VerseProps {
 
 const Verse = ({ number, verse, indent }: VerseProps) => {
   const [active, setActive] = useState<boolean>(false);
+  const [a, sA] = useState<string[]>([]);
 
   return (
     <Fragment>
@@ -244,11 +245,38 @@ const Verse = ({ number, verse, indent }: VerseProps) => {
         </span>
         <div className="w-1.5 inline-block" />
       </span>
-      <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative">
-        <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" />
-        <div className="flex gap-1 items-center">
+      <div
+        className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5"
+        onClick={() => sA((p) => [...p, "new"])}
+      >
+        {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
+        <div className="flex gap-1 items-center max-h-4">
           {/* <span className="text-xs">13</span> */}
-          <MessageCircle size={12} className="" />
+          <div className="flex items-center gap-0.5">
+            <span className="text-[10px]">12</span>
+            <MessageCircle size={12} className="" />
+          </div>
+          <div className="flex items-center gap-0.5">
+            <span className="text-[10px]">12</span>
+            <Highlighter size={12} className="" />
+          </div>
+          <div
+            className={cn("gap-0.5 grid transition-all ease-in-out")}
+            style={{
+              gridTemplateColumns: Array(a.length)
+                .fill(0)
+                .map(() => `1fr`)
+                .join(" "),
+            }}
+          >
+            {a.map((_, i) => (
+              <Avatar
+                key={COLORS[i]}
+                color={COLORS[i]}
+                className="size-4 grid-cols-1"
+              />
+            ))}
+          </div>
         </div>
       </div>
     </Fragment>
