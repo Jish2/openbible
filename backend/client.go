@@ -92,6 +92,7 @@ func (c *Client) handleMessage(parse NewEvent) {
 	}
 	event := Event{
 		UUID:    c.UserID,
+		name:    c.Name,
 		Action:  parse.Action,
 		VerseID: parse.VerseID,
 		Message: parse.Message,
@@ -169,6 +170,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	// add and broadcast join event
 	// client.hub.addEvent(Event{
 	// 	UUID:    uuid,
+	// 	name:    client.Name,
 	// 	Action:  "join",
 	// 	VerseID: 0,
 	// 	Message: client.Name,
