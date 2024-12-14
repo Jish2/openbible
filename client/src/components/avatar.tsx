@@ -1,12 +1,15 @@
+import { cn } from "../utils/cn";
+
 interface AvatarProps {
   color: string;
-  zIndex: number;
+  zIndex?: number;
+  className?: string;
 }
 
-export const Avatar = ({ color, zIndex }: AvatarProps) => {
+export const Avatar = ({ color, zIndex, className }: AvatarProps) => {
   return (
     <div
-      className="inline-block size-8 rounded-full"
+      className={cn("inline-block size-8 rounded-full", className)}
       style={{ backgroundColor: color, zIndex }}
     />
   );
