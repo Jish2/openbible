@@ -41,6 +41,8 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
+	UserID uuid.UUID
+	Name   string
 	hub *Hub
 
 	// The websocket connection.
@@ -135,24 +137,31 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	client := &Client{
 		UserID: uuid,
 		hub:    hub,
+		Name:   "test",
 		conn:   conn,
 		send:   make(chan []byte, 256)}
 
-	joinMsg := BroadcastMessage{
+	joinMsg := Response{
 		Action: "subscribe",
 		Msg:    uuid.String(),
 	}
 
 	parsedResponse, err := json.Marshal(joinMsg)
+
 	if err != nil {
 		log.Println(err)
 	}
 
 	client.hub.register <- client
 
-	client.send <- []byte(parsedResponse)
+	client.hub.addEvent(Event{
+		UUID:   uuid,
+		Action: "join",
+		VerseID: 0,
+		Message: client.Name,
+	})
 
-	client.hub.sendRooms()
+	client.send <- []byte(parsedResponse)
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

@@ -7,3 +7,10 @@ type User struct {
 	VersePosition     int
 	SelectedVerseUUID uuid.UUID
 }
+
+type Response struct {
+	Action string
+	Msg    string
+	Body any
+}
+

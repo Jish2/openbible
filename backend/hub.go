@@ -4,9 +4,16 @@
 
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"sync"
+)
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
+	mu sync.Mutex
 	// Registered clients.
 	clients map[*Client]bool
 
@@ -18,6 +25,24 @@ type Hub struct {
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	events []Event
+}
+
+func (h *Hub) addEvent(event Event) {
+	h.mu.Lock()
+	h.events = append(h.events, event)
+	h.mu.Unlock()
+
+	h.broadcastMessage(event)
+}
+
+func (hub *Hub) broadcastMessage(event Event) {
+	parsedResponse, err := json.Marshal(event)
+	if err != nil {
+		fmt.Println(err)
+	}
+	hub.broadcast <- []byte(parsedResponse)
 }
 
 func newHub() *Hub {
