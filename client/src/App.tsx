@@ -312,12 +312,12 @@ function App() {
         </div>
       </div>
 
-      <button
+      {/* <button
         className="fixed bottom-0 left-0 p-4 bg-red-300"
         onClick={() => setShowMenu((p) => !p)}
       >
         trigger
-      </button>
+      </button> */}
       <div
         className={cn(
           showMenu
@@ -367,6 +367,12 @@ const Verse = ({
   highlightCount,
   isHighlighted,
 }: VerseProps) => {
+  const showMenu = !(
+    commentCount === 0 &&
+    highlightCount === 0 &&
+    versesItem.selected.length === 0
+  );
+
   return (
     <Fragment>
       {indent && <div className="w-6 inline-block" />}
@@ -382,25 +388,24 @@ const Verse = ({
         </span>
         <div className="w-1.5 inline-block" />
       </span>
-      {commentCount !== 0 &&
-        highlightCount !== 0 &&
-        versesItem.selected.length !== 0 && (
-          <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
-            {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
-            <div className="flex gap-1 items-center max-h-4">
-              {/* <span className="text-xs">13</span> */}
-              {commentCount > 0 && (
-                <div className="flex items-center gap-0.5">
-                  <span className="text-[10px]">{commentCount}</span>
-                  <MessageCircle size={12} className="" />
-                </div>
-              )}
-              {highlightCount > 0 && (
-                <div className="flex items-center gap-0.5">
-                  <span className="text-[10px]">{highlightCount}</span>
-                  <Highlighter size={12} className="" />
-                </div>
-              )}
+      {showMenu && (
+        <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
+          {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
+          <div className="flex gap-1 items-center max-h-4">
+            {/* <span className="text-xs">13</span> */}
+            {commentCount > 0 && (
+              <div className="flex items-center gap-0.5">
+                <span className="text-[10px]">{commentCount}</span>
+                <MessageCircle size={12} className="" />
+              </div>
+            )}
+            {highlightCount > 0 && (
+              <div className="flex items-center gap-0.5">
+                <span className="text-[10px]">{highlightCount}</span>
+                <Highlighter size={12} className="" />
+              </div>
+            )}
+            {versesItem.selected.length > 0 && (
               <div
                 className={cn("gap-0.5 grid transition-all ease-in-out")}
                 style={{
@@ -419,9 +424,10 @@ const Verse = ({
                   />
                 ))}
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
     </Fragment>
   );
 };
