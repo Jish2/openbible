@@ -130,7 +130,7 @@ function App() {
 
   useEffect(() => {
     ws.current = new WebSocket(
-      `ws://localhost:8080/ws?name=${names[Math.floor(Math.random() * names.length)]} `,
+      `wss://backend-weathered-pine-3602.fly.dev/ws?name=${names[Math.floor(Math.random() * names.length)]} `,
     );
     ws.current.onopen = () => console.log("ws opened");
     ws.current.onclose = () => console.log("ws closed");
