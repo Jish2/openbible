@@ -66,9 +66,7 @@ export const BottomSheet = ({
             onClick={onHighlight}
           >
             <Button
-              className={cn(
-                "rounded-full max-w-10 shadow-derek text-background",
-              )}
+              className={cn("rounded-full max-w-10 shadow-derek text-black")}
               variant="outline"
             >
               <Highlighter />
