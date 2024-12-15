@@ -82,9 +82,7 @@ export const BottomSheet = ({
           <SheetHeader>
             <SheetTitle>John 1:{verseNumber}</SheetTitle>
             <SheetDescription>
-              {verseNumber
-                ? john1.find((verse) => verse[0] === String(verseNumber))?.[1]
-                : ""}
+              {verseNumber ? john1[verseNumber][1] : ""}
             </SheetDescription>
           </SheetHeader>
           <div className="grid gap-4 py-4">
