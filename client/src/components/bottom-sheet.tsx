@@ -66,12 +66,14 @@ export const BottomSheet = ({
             onClick={onHighlight}
           >
             <Button
-              className={cn("rounded-full max-w-10 shadow-derek")}
+              className={cn(
+                "rounded-full max-w-10 shadow-derek text-background",
+              )}
               variant="outline"
             >
               <Highlighter />
             </Button>
-            <p className="text-background">
+            <p className="text-white">
               {isHighlighted(verseNumber ?? -1)
                 ? "You've highlighted this verse"
                 : "Highlight this verse"}
