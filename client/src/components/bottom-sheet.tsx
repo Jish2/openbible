@@ -93,7 +93,7 @@ export const BottomSheet = ({
                 ? verses[verseNumber]?.comments.map(
                     ({ name, userID, text }) => {
                       return (
-                        <div className="border border-solid border-gray-300 p-4 rounded-lg">
+                        <div className="border border-solid border-gray-300 p-4 rounded-lg text-black">
                           <div className="flex items-center gap-2 pb-2">
                             <Avatar name={name} userID={userID} className="" />
                             <p>
