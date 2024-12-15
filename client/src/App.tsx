@@ -217,6 +217,8 @@ function App() {
         : false,
     );
 
+  const currentUser = users.find((user) => user.UserID === userID);
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <div
@@ -239,8 +241,12 @@ function App() {
               className="size-4 invert"
             />
           </a>
+          {currentUser?.Name && (
+            <div>
+              You are <strong>{currentUser.Name}</strong>
+            </div>
+          )}
         </div>
-
         <div className="flex -space-x-2 overflow-hidden">
           {/* type User = {
           name: string;
