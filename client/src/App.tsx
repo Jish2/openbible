@@ -280,7 +280,7 @@ function App() {
                 verse={verse}
                 indent={indent}
                 versesItem={verses[i]}
-                onClick={() => setSelectedVerse(Number(key))}
+                onClick={() => setSelectedVerse(i)}
                 active={selectedVerse === Number(key)}
                 commentCount={verses[i].comments.length}
                 highlightCount={verses[i].highlights.length}

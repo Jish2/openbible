@@ -120,7 +120,7 @@ export const BottomSheet = ({
                 <Input
                   placeholder="annotate this verse"
                   type="text"
-                  className="rounded-full shadow-derek text-sm"
+                  className="rounded-full shadow-derek text-sm text-black"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") onSubmit();
                   }}
