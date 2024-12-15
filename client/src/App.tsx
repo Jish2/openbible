@@ -324,7 +324,7 @@ function App() {
       >
         trigger
       </button> */}
-      <div
+      {/* <div
         className={cn(
           showMenu
             ? "animate-fly-in opacity-100"
@@ -336,7 +336,7 @@ function App() {
         {["🏠", "🖍️", "💬"].map((item) => (
           <div className="px-2">{item}</div>
         ))}
-      </div>
+      </div> */}
 
       <BottomSheet
         setSelectedVerse={setSelectedVerse}
