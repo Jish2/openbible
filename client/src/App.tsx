@@ -389,7 +389,10 @@ const Verse = ({
         <div className="w-1.5 inline-block" />
       </span>
       {showMenu && (
-        <div className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5">
+        <div
+          className="shadow-derek inline-block p-1 mr-2 rounded-md cursor-pointer relative -translate-y-0.5"
+          onClick={onClick}
+        >
           {/* <div className="bg-red-600 rounded-full size-2 absolute -top-0.5 -right-0.5" /> */}
           <div className="flex gap-1 items-center max-h-4">
             {/* <span className="text-xs">13</span> */}
